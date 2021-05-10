@@ -1,0 +1,11 @@
+{
+    "presets": [["@babel/preset-env", {
+        "targets": {
+            "edge": "17",
+            "chrome": "67",
+            "ie": 9
+        },
+        "corejs": 2, //3x最新
+        "useBuiltIns": "usage" // entry usage false
+    }]]
+}
