@@ -1,14 +1,12 @@
-const HtmlWebpackPlugin = require("html-webpack-plugin");
 const path = require("path");
-const base = process.env.NODE_ENV === "production" ? "./" : "./";
-
+const HtmlWebpackPlugin = require("html-webpack-plugin");
+const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 module.exports = {
   devtool: "source-map",
   mode: process.env.NODE_ENV === "production" ? "production" : "development",
   entry: path.resolve(__dirname, "./src/index.js"),
   output: {
-    publicPath: base,
-    filename: "main.js",
+    filename: "[name].js",
     path: path.resolve(__dirname, "./dist"),
   },
   module: {
@@ -17,10 +15,12 @@ module.exports = {
         test: /\.(png|jpe?g|gif)$/i,
         use: [
           {
-            loader: "file-loader",
+            loader: "url-loader",
             options: {
-              outputPath: "images",
-              publicPath: base + "/images",
+              name: "[name].[ext]",
+              outputPath: "images/",
+              publicPath: "../images",
+              limit: 1024 * 3,
             },
           },
         ],
@@ -31,7 +31,9 @@ module.exports = {
     contentBase: "./dist",
     port: 8081,
     open: true,
-    hotOnly: true
 },
-  plugins: [new HtmlWebpackPlugin()],
+  plugins: [
+    new HtmlWebpackPlugin(),
+    new CleanWebpackPlugin(),
+  ],
 };

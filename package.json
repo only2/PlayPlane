@@ -4,8 +4,9 @@
   "description": "Vue3.0+PIXI.js实现简单的飞机大战小游戏",
   "main": "index.js",
   "scripts": {
-    "build": "NODE_ENV=production webpack --mode=production --sourcemap",
-    "dev": "NODE_ENV=development webpack --watch --mode=development --sourcemap"
+    "dev": "webpack",
+    "serve": "webpack-dev-server",
+    "build": "NODE_ENV=production webpack --mode=production"
   },
   "repository": {
     "type": "git",
@@ -27,6 +28,7 @@
   },
   "homepage": "https://github.com/only2/PlayPlane#readme",
   "devDependencies": {
+    "url-loader": "^4.1.1",
     "webpack": "^4.43.0",
     "webpack-cli": "^3.3.12",
     "webpack-dev-server": "^3.11.0"
@@ -38,9 +40,15 @@
     "@vue/runtime-core": "^3.0.0-beta.14",
     "pixi.js": "^5.2.4",
     "@babel/polyfill": "^7.12.1",
-    "clean-webpack-plugin": "^4.0.0-alpha.0",
+    "clean-webpack-plugin": "^3.0.0",
     "css-loader": "^5.2.1",
+    "url-loader": "^4.1.1",
     "file-loader": "^6.2.0",
     "html-webpack-plugin": "^4.5.2"
-  }
+  },
+  "browserslist": [
+    "last 2 version",
+    "> 1%",
+    "not ie < 11"
+  ]
 }
