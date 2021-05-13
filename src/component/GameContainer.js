@@ -1,6 +1,7 @@
 import { h, ref, computed } from "../init/index.js";
 import StartPage from "../page/StartPage";
 import GamePage from "../page/GamePage";
+import EndPage from "../page/EndPage";
 export const PAGE = {
   start: "startPage",
   game: "gamePage",
@@ -9,6 +10,7 @@ export const PAGE = {
 const pageMap = {
   [PAGE.start]: StartPage,
   [PAGE.game]: GamePage,
+  [PAGE.end]: EndPage
 };
 
 export default {
