@@ -9,6 +9,7 @@ import {
     onUnmounted,
   } from "../init/index.js";
 import Plane, { PlaneInfo } from "../plane.js";
+import EnemyPlane, { EnemyPlaneInfo } from "../enemyPlane.js";
 import { stage } from "../config.js";
 import { keyboardMove } from "../control";
 // 生成我方战机function
@@ -54,6 +55,27 @@ const createSelfPlane = ({ x, y, speed }) => {
     selfPlane.y = selfPlaneY;
     return selfPlane;
 };
+// 生成敌方战机生成我方战机function
+const createEnemyPlanes = () => {
+    //生产敌机
+    const createEnemyPlaneData = (x) => {
+      return {
+        x,
+        y: -100,
+        width: EnemyPlaneInfo.width,
+        height: EnemyPlaneInfo.height,
+        life: EnemyPlaneInfo.life,
+      };
+    };
+  
+    const enemyPlanes = reactive([]);
+  
+    setInterval(() => {
+      const x = Math.floor((1 + stage.width) * Math.random());
+      enemyPlanes.push(createEnemyPlaneData(x));
+    }, 600);
+    return enemyPlanes;
+};
 export default defineComponent({
     props: ["onNextPage"],
     setup(props) {
@@ -62,22 +84,33 @@ export default defineComponent({
         y: stage.height,
         speed: 7,
       });
-      console.log('selfPlane', selfPlane)
+      const enemyPlanes = createEnemyPlanes();
       return {
-        selfPlane
+        selfPlane,
+        enemyPlanes
       };
     },
     render(ctx) {
-        const createSelfPlane = () => {
+        const createSelfPlaneCom = () => {
             return h(Plane, {
-              x: ctx.selfPlane.x,
-              y: ctx.selfPlane.y,
-              speed: ctx.selfPlane.speed
+                x: ctx.selfPlane.x,
+                y: ctx.selfPlane.y,
+                speed: ctx.selfPlane.speed
+            });
+        };
+        const createEnemyPlaneCom = (info, index) => {
+            return h(EnemyPlane, {
+                key: "EnemyPlane" + index,
+                x: info.x,
+                y: info.y,
+                height: info.height,
+                width: info.width
             });
         };
         return h("Container", [
             h(Map),
-            createSelfPlane()
+            createSelfPlaneCom(),
+            ...ctx.enemyPlanes.map(createEnemyPlaneCom),
         ]);
     }
 });
