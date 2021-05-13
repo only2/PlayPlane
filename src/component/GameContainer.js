@@ -1,6 +1,6 @@
 import { h, ref, computed } from "../init/index.js";
 import StartPage from "../page/StartPage";
-
+import GamePage from "../page/GamePage";
 export const PAGE = {
   start: "startPage",
   game: "gamePage",
@@ -8,6 +8,7 @@ export const PAGE = {
 };
 const pageMap = {
   [PAGE.start]: StartPage,
+  [PAGE.game]: GamePage,
 };
 
 export default {
@@ -27,6 +28,7 @@ export default {
   },
 
   render(ctx) {
+    console.log('ctx.currentPage', ctx.currentPage)
     return h("Container", [
       h(ctx.currentPage, {
         onNextPage: ctx.handleNextPage,
