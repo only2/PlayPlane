@@ -10,7 +10,7 @@ import {
   } from "../init/index.js";
 import Plane, { PlaneInfo } from "../plane.js";
 import { stage } from "../config.js";
-
+import { keyboardMove } from "../control";
 // 生成我方战机function
 const createSelfPlane = ({ x, y, speed }) => {
     const selfPlane = reactive({
@@ -19,7 +19,13 @@ const createSelfPlane = ({ x, y, speed }) => {
       speed,
       width: PlaneInfo.width,
       height: PlaneInfo.height,
-    });  
+    });
+    // 绑定上下左右移动
+    const { x: selfPlaneX, y: selfPlaneY } = keyboardMove({
+        x: selfPlane.x,
+        y: selfPlane.y,
+        speed: selfPlane.speed,
+    });
     // 缓动出场
     var tween = new TWEEN.Tween({
       x,
@@ -44,6 +50,8 @@ const createSelfPlane = ({ x, y, speed }) => {
     onMounted(() => {
       game.ticker.add(handleTicker);
     });
+    selfPlane.x = selfPlaneX;
+    selfPlane.y = selfPlaneY;
     return selfPlane;
 };
 export default defineComponent({
