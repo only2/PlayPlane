@@ -8,6 +8,12 @@ export const SelfBulletInfo = {
 	rotation: 0,
 	dir: -1,
 };
+export const EnemyBulletInfo = {
+	width: 61,
+	height: 99,
+	rotation: 0,
+	dir: 1,
+};
 //子弹
 export default defineComponent({
   props: ["x", "y", "id", "rotation", "dir"],

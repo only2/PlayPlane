@@ -20,6 +20,7 @@ export default defineComponent({
         texture: startPageAsset,
         key: "1",
       }),
+      h("Text", {x: 100, y:100,}, '已经消灭多少个了'),
       h("Sprite", {
         x: 230,
         y: 515,

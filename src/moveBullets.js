@@ -11,7 +11,7 @@ const isOverBorder = (val) => {
   	}
   	return false;
 };
-export const moveSelfBullets = (bullets) => {
+export const moveBullets = (bullets) => {
 	bullets.forEach((bullet, index) => {
 		const dir = bullet.dir;
 		bullet.y += bulletSpeed * dir;

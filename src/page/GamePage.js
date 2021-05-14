@@ -2,7 +2,8 @@ import TWEEN from "@tweenjs/tween.js";
 import Map from "../Map.js";
 import { game } from "../game.js";
 import {
-    h,
+	h,
+	ref,
     reactive,
     defineComponent,
     onMounted,
@@ -10,8 +11,8 @@ import {
 } from "../init/index.js";
 import Plane, { PlaneInfo } from "../plane.js";
 import EnemyPlane, { EnemyPlaneInfo } from "../enemyPlane.js";
-import Bullet, { SelfBulletInfo } from "../bullet.js";
-import { moveSelfBullets } from "../moveSelfBullets";
+import Bullet, { SelfBulletInfo, EnemyBulletInfo } from "../bullet.js";
+import { moveBullets } from "../moveBullets";
 import { stage } from "../config.js";
 import { keyboardMove } from "../control";
 import { moveEnemyPlane } from "../moveEnemyPlane";
@@ -20,7 +21,7 @@ let hashCode = 0;
 const createHashCode = () => {
 	return hashCode++;
 };
-
+const killNumber = ref(0);
 // 生成我方战机function
 const createSelfPlane = ({ x, y, speed }) => {
     const selfPlane = reactive({
@@ -111,10 +112,29 @@ const createSelfBullet = () => {
 		destroySelfBullet,
 	};
 };
+// 敌方子弹
+const createEnemyPlaneBullets = () => {
+	// 创建敌军子弹
+	const enemyPlaneBullets = reactive([]);
+	const addEnemyPlaneBullet = (x, y) => {
+		const id = createHashCode();
+		const width = EnemyBulletInfo.width;
+		const height = EnemyBulletInfo.height;
+		const rotation = EnemyBulletInfo.rotation;
+		const dir = EnemyBulletInfo.dir;
+		enemyPlaneBullets.push({ x, y, id, width, height, rotation, dir });
+	};
+	return {
+		enemyPlaneBullets,
+		addEnemyPlaneBullet,
+	};
+};
+  
 // 战斗相关逻辑
-const startFighting = ({selfPlane, enemyPlanes, selfBullets, gameOverCallback}) => {
+const startFighting = ({selfPlane, enemyPlanes, selfBullets, enemyPlaneBullets, gameOverCallback}) => {
     const handleTicker = () => {
-		moveSelfBullets(selfBullets);
+		moveBullets(selfBullets);
+		moveBullets(enemyPlaneBullets);
         moveEnemyPlane(enemyPlanes);
         // 遍历敌军
 		// 我方和敌军碰撞也会结束游戏
@@ -145,8 +165,19 @@ const startFighting = ({selfPlane, enemyPlanes, selfBullets, gameOverCallback}) 
 					}
 			  	}
 			});
+			// 检测我方子弹是否碰到了敌方子弹
+			enemyPlaneBullets.forEach((enemyBullet, enemyBulletIndex) => {
+				const isIntersect = hitTestRectangle(bullet, enemyBullet);
+				if (isIntersect) {
+					selfBullets.splice(selfIndex, 1);
+					enemyPlaneBullets.splice(enemyBulletIndex, 1);
+				}
+			});
 		});
-        
+		// 遍历敌军的子弹
+		enemyPlaneBullets.forEach((enemyBullet, enemyBulletIndex) => {
+			hitSelfHandle(enemyBullet);
+		});
     };
     
     onUnmounted(() => {
@@ -167,12 +198,17 @@ export default defineComponent({
       	});
 		const enemyPlanes = createEnemyPlanes();
 		const {
+			enemyPlaneBullets,
+			addEnemyPlaneBullet,
+		} = createEnemyPlaneBullets();
+		const {
 			selfBullets,
 			addSelfBullet,
 			destroySelfBullet,
 		} = createSelfBullet();
       	startFighting({
 			selfPlane,
+			enemyPlaneBullets,
 			enemyPlanes,
 			selfBullets,
 			gameOverCallback() {
@@ -180,12 +216,13 @@ export default defineComponent({
 			}
 		});
       	return {
-			selfBullets,
 			addSelfBullet,
 			destroySelfBullet,
-			destroySelfBullet,
+			addEnemyPlaneBullet,
+			selfBullets,
         	selfPlane,
-        	enemyPlanes
+			enemyPlanes,
+			enemyPlaneBullets
       	};
     },
     render(ctx) {
@@ -220,14 +257,18 @@ export default defineComponent({
                 x: info.x,
                 y: info.y,
                 height: info.height,
-                width: info.width
+				width: info.width,
+				onAttack({ x, y }) {
+					ctx.addEnemyPlaneBullet(x, y);
+				},
             });
         };
         return h("Container", [
             h(Map),
             createSelfPlaneCom(),
 			...ctx.enemyPlanes.map(createEnemyPlaneCom),
-			...ctx.selfBullets.map(createBullet),
+			...ctx.enemyPlaneBullets.map(createBullet),
+			...ctx.selfBullets.map(createBullet)
         ]);
     }
 });
